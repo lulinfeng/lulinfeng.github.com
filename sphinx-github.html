@@ -101,8 +101,7 @@ $ cd html
 $ git init</pre>
 </div>
 </li>
-<li><p class="first">然后创建一个没有父节点的分支gh-pages，因为github规定，只有该分支中的页面，才会生成网页文件。
-<strong>因为我们在后面禁用了jekyll，所以不需要github生成网页;直接上传网页文件即可</strong></p>
+<li><p class="first">然后创建一个没有父节点的分支gh-pages，因为github规定，只有该分支中的页面，才会生成网页文件。</p>
 <div class="highlight-python"><pre>$ git checkout --orphan gh-pages</pre>
 </div>
 <p>以下所有动作都在该分支下完成</p>
@@ -148,6 +147,10 @@ $ (vuser) make clean &amp;&amp; make html</pre>
 </div>
 <div class="section" id="id3">
 <h2>配置域名<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>在master分支中，添加一个CNAME文件，文件内容为：<tt class="docutils literal"><span class="pre">www.lulinfeng.com</span></tt></li>
+<li>然后更改域名 <tt class="docutils literal"><span class="pre">lulinfeng.com</span></tt> 的DNS记录，指向lulinfeng.github.io对应的IP地址。</li>
+</ol>
 </div>
 </div>
 
