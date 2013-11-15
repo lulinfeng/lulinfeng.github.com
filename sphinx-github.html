@@ -1,0 +1,213 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>github sphinx配置记录 &mdash; oaweb 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="oaweb 1.0 documentation" href="index.html" />
+    <link rel="prev" title="OA流程开发文档" href="flow.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="flow.html" title="OA流程开发文档"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">oaweb 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="github-sphinx">
+<h1>github sphinx配置记录<a class="headerlink" href="#github-sphinx" title="Permalink to this headline">¶</a></h1>
+<p>想在github上使用Sphinx来写我们的项目文档，但是不支持这么好用的文档编辑神器。</p>
+<p>Github创建页面相对比较简单，在你的项目建立一个独特的分支名gh-pages。任何时候，在这个分支的根目录，都作为web根目录，映射到 <a class="reference external" href="http://reponame.github.com">http://reponame.github.com</a> 。</p>
+<p>所以，我们基本任务是在我们项目里，创建一个独一无二的分支，这个分支就是&#8221;gh-pages&#8221;，然后将正常方式生成的文档，覆盖到这个分支目录下，然后commit提交。</p>
+<p>很明显，我想让生成文档的整个过程自动化，但是，那必须等到我们拥有能控制，及方便的自动创建文档的脚本，让我们一步一步来。。。</p>
+<div class="section" id="id1">
+<h2>首先注册帐号并创建代码仓库<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>点击sign up 字样，注册一个帐号</li>
+<li>然后点击右上角+号图标，新建一个项目(repository)</li>
+<li>俺注册了lulinfeng的帐号，项目名为html</li>
+</ol>
+</div>
+<div class="section" id="git">
+<h2>本地git配置<a class="headerlink" href="#git" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">首先配置下本地git，在shell里输入下面代码</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">git</span> <span class="n">config</span> <span class="o">--</span><span class="k">global</span> <span class="n">user</span><span class="o">.</span><span class="n">name</span> <span class="s">&quot;用户名&quot;</span>
+<span class="n">git</span> <span class="n">config</span> <span class="o">--</span><span class="k">global</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span> <span class="s">&quot;邮箱&quot;</span>
+<span class="n">git</span> <span class="n">config</span> <span class="o">--</span><span class="k">global</span> <span class="n">credential</span><span class="o">.</span><span class="n">helper</span> <span class="n">cache</span>
+<span class="n">git</span> <span class="n">config</span> <span class="o">--</span><span class="k">global</span> <span class="n">credential</span><span class="o">.</span><span class="n">helper</span> <span class="s">&#39;cache --timeout=3600&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">创建一个SSH Keys，在～/.ssh文件夹里，如果已经有就略过这步，直接使用</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ssh</span><span class="o">-</span><span class="n">keygen</span> <span class="o">-</span><span class="n">t</span> <span class="n">rsa</span> <span class="o">-</span><span class="n">C</span> <span class="s">&quot;yourname@mail.com&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">选择保存位置，直接回车即可，默认位置：~/.ssh/id_rsa.pub</p>
+</li>
+<li><p class="first">接下来还要输入密码</p>
+</li>
+<li><p class="first">复制id_rsa.pub里面的内容，粘贴到Github项目的SSH Keys中</p>
+</li>
+<li><p class="first">输入以下代码 ，测试链接是否成功。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ssh</span> <span class="o">-</span><span class="n">T</span> <span class="n">git</span><span class="nd">@github.com</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">第一次连接还要输入Yes，确认一下</p>
+</li>
+<li><p class="first">最后提示 Hi yourname！ You&#8217;ve successfully..就表示成功了</p>
+</li>
+</ol>
+</div>
+<div class="section" id="id2">
+<h2>创建本地仓库<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">建立一个目录，并出适合git项目</p>
+<div class="highlight-python"><pre>$ mkdir html
+$ cd html
+$ git init</pre>
+</div>
+</li>
+<li><p class="first">然后创建一个没有父节点的分支gh-pages，因为github规定，只有该分支中的页面，才会生成网页文件。
+<strong>因为我们在后面禁用了jekyll，所以不需要github生成网页;直接上传网页文件即可</strong></p>
+<div class="highlight-python"><pre>$ git checkout --orphan gh-pages</pre>
+</div>
+<p>以下所有动作都在该分支下完成</p>
+</li>
+<li><p class="first">将你的sphinx生成的html及资源目录，复制到该文件夹下</p>
+<div class="highlight-python"><pre>touch .nojekyll
+git add .nojekyll
+git commit -m "First init gh-pages"</pre>
+</div>
+<p>添加.nojekyll文件，关闭jekyll配置，并且可以让由Sphinx生成的_开头的文件(_static,_source)能直接使用，而无需更改。</p>
+<p>现在我们已经有 gh-pages 分支，可以丢点东西进去。 类似以下面内容创建一个文件，在master主分支下。</p>
+<div class="highlight-python"><pre>#These might be parameters
+SRCDOCS=/home/pbrian/src/rhaptos2.user/docs/_build/html
+TMPREPO=/tmp/docs/user
+
+### get the last commit message
+cd $SRCDOCS
+MSG="Adding gh-pages docs for `git log -1 --pretty=short --abbrev-commit`"
+
+### clear the decks
+rm -rf $TMPREPO
+mkdir -p -m 0755 $TMPREPO
+
+### checkout gh-pages into TMP
+git clone git@github.com:Connexions/rhaptos2.user.git $TMPREPO
+
+cd $TMPREPO
+git checkout gh-pages
+
+### cp the docs over and commit
+cp -r $SRCDOCS/ $TMPREPO
+git add -A
+git commit -m "$MSG" &amp;&amp; git push origin gh-pages</pre>
+</div>
+<p>确定已经创建主分支&lt;master&gt;文档,在下面的目录</p>
+<div class="highlight-python"><pre>$ cd docs
+$ workon vuser
+$ (vuser) make clean &amp;&amp; make html</pre>
+</div>
+<p>这个可以彻底的遍历每一个仓库，十分方便的自动创建文档。只是，它是通过创建gh-pages的clone临时拷贝，并且拷贝预先生成的html到正确的位置。</p>
+</li>
+</ol>
+</div>
+<div class="section" id="id3">
+<h2>配置域名<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">github sphinx配置记录</a><ul>
+<li><a class="reference internal" href="#id1">首先注册帐号并创建代码仓库</a></li>
+<li><a class="reference internal" href="#git">本地git配置</a></li>
+<li><a class="reference internal" href="#id2">创建本地仓库</a></li>
+<li><a class="reference internal" href="#id3">配置域名</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="flow.html"
+                        title="previous chapter">OA流程开发文档</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/sphinx-github.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="flow.html" title="OA流程开发文档"
+             >previous</a> |</li>
+        <li><a href="index.html">oaweb 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, lu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

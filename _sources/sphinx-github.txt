@@ -1,0 +1,114 @@
+=========================================
+github sphinx配置记录
+=========================================
+
+想在github上使用Sphinx来写我们的项目文档，但是不支持这么好用的文档编辑神器。
+
+Github创建页面相对比较简单，在你的项目建立一个独特的分支名gh-pages。任何时候，在这个分支的根目录，都作为web根目录，映射到 http://reponame.github.com 。
+
+所以，我们基本任务是在我们项目里，创建一个独一无二的分支，这个分支就是"gh-pages"，然后将正常方式生成的文档，覆盖到这个分支目录下，然后commit提交。
+
+很明显，我想让生成文档的整个过程自动化，但是，那必须等到我们拥有能控制，及方便的自动创建文档的脚本，让我们一步一步来。。。
+
+首先注册帐号并创建代码仓库
+=========================================
+#. 点击sign up 字样，注册一个帐号
+#. 然后点击右上角+号图标，新建一个项目(repository)
+#. 俺注册了lulinfeng的帐号，项目名为html
+
+本地git配置
+=============================
+#. 首先配置下本地git，在shell里输入下面代码
+
+   .. code-block:: python
+   
+      git config --global user.name "用户名"
+      git config --global user.email "邮箱"
+      git config --global credential.helper cache
+      git config --global credential.helper 'cache --timeout=3600'
+
+#. 创建一个SSH Keys，在～/.ssh文件夹里，如果已经有就略过这步，直接使用
+
+   .. code-block:: python
+   
+      ssh-keygen -t rsa -C "yourname@mail.com"
+
+#. 选择保存位置，直接回车即可，默认位置：~/.ssh/id_rsa.pub
+#. 接下来还要输入密码
+#. 复制id_rsa.pub里面的内容，粘贴到Github项目的SSH Keys中
+#. 输入以下代码 ，测试链接是否成功。
+
+   .. code-block:: python
+
+      ssh -T git@github.com
+
+#. 第一次连接还要输入Yes，确认一下
+#. 最后提示 Hi yourname！ You've successfully..就表示成功了
+
+创建本地仓库
+=====================
+#. 建立一个目录，并出适合git项目
+
+   ::
+
+      $ mkdir html
+      $ cd html
+      $ git init
+
+#. 然后创建一个没有父节点的分支gh-pages，因为github规定，只有该分支中的页面，才会生成网页文件。
+   **因为我们在后面禁用了jekyll，所以不需要github生成网页;直接上传网页文件即可**
+
+   ::
+
+      $ git checkout --orphan gh-pages
+
+   以下所有动作都在该分支下完成
+#. 将你的sphinx生成的html及资源目录，复制到该文件夹下
+
+   ::
+
+      touch .nojekyll
+      git add .nojekyll
+      git commit -m "First init gh-pages"
+
+   添加.nojekyll文件，关闭jekyll配置，并且可以让由Sphinx生成的_开头的文件(_static,_source)能直接使用，而无需更改。
+
+   现在我们已经有 gh-pages 分支，可以丢点东西进去。 类似以下面内容创建一个文件，在master主分支下。
+
+   ::
+
+      #These might be parameters
+      SRCDOCS=/home/pbrian/src/rhaptos2.user/docs/_build/html
+      TMPREPO=/tmp/docs/user
+      
+      ### get the last commit message
+      cd $SRCDOCS
+      MSG="Adding gh-pages docs for `git log -1 --pretty=short --abbrev-commit`"
+      
+      ### clear the decks
+      rm -rf $TMPREPO
+      mkdir -p -m 0755 $TMPREPO
+      
+      ### checkout gh-pages into TMP
+      git clone git@github.com:Connexions/rhaptos2.user.git $TMPREPO
+      
+      cd $TMPREPO
+      git checkout gh-pages
+      
+      ### cp the docs over and commit
+      cp -r $SRCDOCS/ $TMPREPO
+      git add -A
+      git commit -m "$MSG" && git push origin gh-pages
+
+   确定已经创建主分支<master>文档,在下面的目录
+
+   ::
+
+      $ cd docs
+      $ workon vuser
+      $ (vuser) make clean && make html 
+
+   这个可以彻底的遍历每一个仓库，十分方便的自动创建文档。只是，它是通过创建gh-pages的clone临时拷贝，并且拷贝预先生成的html到正确的位置。
+
+配置域名
+============
