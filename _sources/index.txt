@@ -13,3 +13,4 @@
 
    flow
    sphinx-github
+   ripple
